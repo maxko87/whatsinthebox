@@ -1,3 +1,12 @@
+getCSRF = ->
+  text = ""
+  possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  i = 0
+  while i < 15
+    text += possible.charAt(Math.floor(Math.random() * possible.length))
+    i++
+  return text
+
 getURLParameter = (name) ->
   decodeURI (RegExp(name + "=" + "(.+?)(&|$)").exec(location.search) or [null])[1]
 
@@ -98,8 +107,7 @@ $ ->
   $('#loading').hide()
   access_token = getHashParams()['access_token']
   if not access_token
-    state = "09asd82n20fh90ds0h0sna0"
-    $('#authentication a').attr('href', $('#authentication a').attr('href') + "&state=" + state)
+    $('#authentication a').attr('href', $('#authentication a').attr('href') + "&state=" + getCSRF)
   else
     $("#loading").show()
     $('#page1').hide()
