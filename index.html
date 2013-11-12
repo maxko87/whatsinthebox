@@ -1,0 +1,41 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>D3 Test</title>
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="d3.js"></script>
+    <script type="text/javascript" src="scripts.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css"></style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+
+    <div id="page1">
+      <div id="background"></div>
+      <div id="floater">
+        <div id="pad"></div>
+        <div id="intro">
+          <h1>WHAT'S IN THE BOX?!</h1>
+          <p>Visualize your Dropbox space usage.</p> 
+          <div id="authentication">
+            <button onclick="location.href='https://www.dropbox.com/1/oauth2/authorize?client_id=hqmdenovoa49a99&response_type=token&redirect_uri=http://localhost'">Authorize</button>
+          </div>
+          <!-- <img src="dropbox.png"> -->
+        </div>
+      </div>
+    </div>
+
+    <div id="loading">
+      <div id="pad2"></div>
+      <img src="loading.gif">
+    </div>
+
+<!--     <form>
+      <label><input type="radio" name="mode" id="size" checked> Size</label>
+      <label><input type="radio" name="mode" id="count"> Count</label>
+    </form> -->
+
+  </body>
+</html>
