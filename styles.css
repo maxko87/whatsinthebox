@@ -18,6 +18,10 @@ form {
   z-index: 1;
 }
 
+h1 {
+  margin-bottom: 3px;
+}
+
 a, button {
   margin-top: 10px;
   margin-bottom: 10px;

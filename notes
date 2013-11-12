@@ -1,4 +1,12 @@
 -localhost doesn't work, 127.0.0.1 doesn't work, http://localhost works
+-no permission to only read files
+
+
+TODOS:
+-only read permissions
+DONE -add file size to tool tip
+DONE -don't show small files
+-show free space
 
 
 

@@ -1,3 +1,18 @@
+MIN_BYTES = 100000
+
+formatSizeUnits = (bytes) ->
+  if (bytes >> 30) & 0x3FF
+    bytes = (bytes >>> 30) + "." + (bytes & (3 * 0x3FF)) + "GB"
+  else if (bytes >> 20) & 0x3FF
+    bytes = (bytes >>> 20) + "." + (bytes & (2 * 0x3FF)) + "MB"
+  else if (bytes >> 10) & 0x3FF
+    bytes = (bytes >>> 10) + "." + (bytes & (0x3FF)) + "KB"
+  else if (bytes >> 1) & 0x3FF
+    bytes = (bytes >>> 1) + "Bytes"
+  else
+    bytes = bytes + "Byte"
+  return bytes
+
 getCSRF = ->
   text = ""
   possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
@@ -24,34 +39,6 @@ getHashParams = ->
 extractName = (name) ->
   name[(name.lastIndexOf("/") + 1)...(name.length)]
 
-getDataForUrl = (dict, urlAddon) ->
-  $.ajax(
-    type: "GET"
-    url: "https://api.dropbox.com/1/metadata/dropbox" + urlAddon
-    headers:
-      "Authorization": "Bearer " + access_token
-  ).fail (data) ->
-    folder = JSON.parse(data["responseText"])
-    # for file in folder.contents
-    #   if file.is_dir
-    #     cleaned_path = encodeURI(file.path)
-    #     new_dict = {}
-    #     getDataForUrl(new_dict, cleaned_path)
-    #     dict[file.path] = new_dict
-    #   else
-    #     dict[file.path] = file
-    dict['name'] = extractName(folder.path)
-    children = []
-    dict['children'] = children
-    for file in folder.contents
-      if file.is_dir
-        cleaned_path = encodeURI(file.path)
-        new_dict = {}
-        getDataForUrl(new_dict, cleaned_path)
-        children.push(new_dict)
-      else
-        children.push({'name': extractName(file.path), 'size': file.bytes})
-
 setupTooltip = ->
   $(document).tooltip(
     show:
@@ -60,6 +47,10 @@ setupTooltip = ->
     hide:
       effect: "appear"
       duration: 0
+    items:
+      '.node'
+    content: ->
+      return "<b>Name: </b>" + this.__data__.name + "<br><b>Size: </b>" + formatSizeUnits(this.__data__.size)
   )
 
 drawTreeMap = () ->
@@ -91,13 +82,46 @@ drawTreeMap = () ->
         .attr("class", "node")
         .call(position)
         .style("background", (d) -> (if d.children then color(d.name) else null))
-        .attr("title", (d) -> (if d.children then null else d.name))
+        #.attr("title", (d) -> (if d.children then null else d.name))
       #.text((d) -> (if d.children then null else d.name))
   d3.selectAll("input").on "change", change = ->
     value = switch (@value)
       when "count" then 1
       when "size" then (d) -> d.size
     node.data(treemap.value(value).nodes).transition().duration(1500).call position
+
+getDataForUrl = (dict, urlAddon) ->
+  $.ajax(
+    type: "GET"
+    url: "https://api.dropbox.com/1/metadata/dropbox" + urlAddon
+    headers:
+      "Authorization": "Bearer " + access_token
+  ).fail (data) ->
+    folder = JSON.parse(data["responseText"])
+    dict['name'] = extractName(folder.path)
+    children = []
+    dict['children'] = children
+    if (urlAddon == "/")
+      getFreeSpace(dict)
+    for file in folder.contents
+      if file.is_dir
+        cleaned_path = encodeURI(file.path)
+        new_dict = {}
+        getDataForUrl(new_dict, cleaned_path)
+        children.push(new_dict)
+      else
+        if file.bytes > MIN_BYTES
+          children.push({'name': extractName(file.path), 'size': file.bytes})
+
+getFreeSpace = (dict) ->
+  $.ajax(
+    type: "GET"
+    url: "https://api.dropbox.com/1/account/info"
+    headers:
+      "Authorization": "Bearer " + access_token
+  ).fail (data) ->
+    data = JSON.parse(data["responseText"])
+    #dict['children'].push({"name": 'Free Space', "size": data["quota_info"]["quota"]})
 
 access_token = null
 final = {}
@@ -122,6 +146,7 @@ $ ->
         drawTreeMap()
         clearInterval(in_id)
       prev_final = jQuery.extend(true, {}, final)
+      console.log(final)
     ), 1000
 
 
