@@ -23,11 +23,9 @@ getDataForUrl = (dict, urlAddon) ->
       "Authorization": "Bearer " + access_token
   ).fail (data) ->
     folder = JSON.parse(data["responseText"])
-    console.log(folder)
     # for file in folder.contents
     #   if file.is_dir
     #     cleaned_path = encodeURI(file.path)
-    #     console.log(cleaned_path)
     #     new_dict = {}
     #     getDataForUrl(new_dict, cleaned_path)
     #     dict[file.path] = new_dict
@@ -39,7 +37,6 @@ getDataForUrl = (dict, urlAddon) ->
     for file in folder.contents
       if file.is_dir
         cleaned_path = encodeURI(file.path)
-        console.log(cleaned_path)
         new_dict = {}
         getDataForUrl(new_dict, cleaned_path)
         children.push(new_dict)
@@ -104,7 +101,6 @@ $ ->
     state = "09asd82n20fh90ds0h0sna0"
     $('#authentication a').attr('href', $('#authentication a').attr('href') + "&state=" + state)
   else
-    console.log("authorized!")
     $("#loading").show()
     $('#page1').hide()
     $('#pad').hide()
@@ -115,7 +111,6 @@ $ ->
       if (JSON.stringify(prev_final) == JSON.stringify(final))
         $('#loading').hide()
         $('form').show()
-        console.log(final)
         drawTreeMap()
         clearInterval(in_id)
       prev_final = jQuery.extend(true, {}, final)

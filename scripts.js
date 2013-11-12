@@ -36,7 +36,6 @@
     }).fail(function(data) {
       var children, cleaned_path, file, folder, new_dict, _i, _len, _ref, _results;
       folder = JSON.parse(data["responseText"]);
-      console.log(folder);
       dict['name'] = extractName(folder.path);
       children = [];
       dict['children'] = children;
@@ -46,7 +45,6 @@
         file = _ref[_i];
         if (file.is_dir) {
           cleaned_path = encodeURI(file.path);
-          console.log(cleaned_path);
           new_dict = {};
           getDataForUrl(new_dict, cleaned_path);
           _results.push(children.push(new_dict));
@@ -142,7 +140,6 @@
       state = "09asd82n20fh90ds0h0sna0";
       return $('#authentication a').attr('href', $('#authentication a').attr('href') + "&state=" + state);
     } else {
-      console.log("authorized!");
       $("#loading").show();
       $('#page1').hide();
       $('#pad').hide();
@@ -153,7 +150,6 @@
         if (JSON.stringify(prev_final) === JSON.stringify(final)) {
           $('#loading').hide();
           $('form').show();
-          console.log(final);
           drawTreeMap();
           clearInterval(in_id);
         }
