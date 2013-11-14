@@ -47,48 +47,88 @@ setupTooltip = ->
     hide:
       effect: "appear"
       duration: 0
+    position:
+      my: "center top"
+      at: "center bottom+20px"
     items:
-      '.node'
+      ".node"
     content: ->
       return "<b>Name: </b>" + this.__data__.name + "<br><b>Size: </b>" + formatSizeUnits(this.__data__.size)
   )
 
-drawTreeMap = () ->
-  position = ->
-    @style("left", (d) -> d.x + "px" ).style("top", (d) -> d.y + "px" ).style("width", (d) -> Math.max(0, d.dx - 1) + "px" ).style "height", (d) -> Math.max(0, d.dy - 1) + "px"
+position = ->
+  @style("left", (d) -> d.x + "px" ).style("top", (d) -> d.y + "px" ).style("width", (d) -> Math.max(0, d.dx - 1) + "px" ).style "height", (d) -> Math.max(0, d.dy - 1) + "px"
 
-  margin =
-    top: 0
-    right: 0
-    bottom: 0
-    left: 0
-
-  # width = 960 - margin.left - margin.right
-  # height = 500 - margin.top - margin.bottom
+div = undefined
+createDivs = ->
   width = window.innerWidth
   height = window.innerHeight
-  color = d3.scale.category20c()
-  treemap = d3.layout.treemap().size([width, height]).sticky(true).value((d) -> d.size)
+
+  margin =
+      top: 0
+      right: 0
+      bottom: 0
+      left: 0
+
   div = d3.select("body").append("div")
     .style("position", "relative")
     .style("width", (width + margin.left + margin.right) + "px")
     .style("height", (height + margin.top + margin.bottom) + "px")
     .style("left", margin.left + "px")
     .style("top", margin.top + "px")
-  node = div.datum(final).selectAll(".node")
+
+depth = 0
+
+drawTreeMap = (data) ->
+  width = window.innerWidth
+  height = window.innerHeight
+  color = d3.scale.category20c()
+
+  treemap = d3.layout.treemap().size([width, height]).sticky(true).value((d) -> d.size)
+
+  node = div.datum(data, (d) -> d.name).selectAll(".node")
       .data(treemap.nodes)
-    .enter()
+
+  node.enter()
       .append("div")
         .attr("class", "node")
         .call(position)
-        .style("background", (d) -> (if d.children then color(d.name) else null))
-        #.attr("title", (d) -> (if d.children then null else d.name))
-      #.text((d) -> (if d.children then null else d.name))
-  d3.selectAll("input").on "change", change = ->
-    value = switch (@value)
-      when "count" then 1
-      when "size" then (d) -> d.size
-    node.data(treemap.value(value).nodes).transition().duration(1500).call position
+        .style("background-color", (d) -> (if d.children then color(d.name) else null))
+        .on "hover", ->
+          $('#path').text(d3.select(this).datum().path)
+        # .on "click", ->
+        #   el = d3.select(this)
+        #   data = el.datum()
+        #   if depth > 4
+        #     return
+        #   if depth == 0 
+        #     while (data.parent.parent)
+        #       data = data.parent
+        #   else if depth == 1
+        #     while (data.parent.parent.parent)
+        #       data = data.parent
+        #   else if depth == 2
+        #     while (data.parent.parent.parent.parent)
+        #       data = data.parent
+        #   else if depth == 3
+        #     while (data.parent.parent.parent.parent.parent)
+        #       data = data.parent
+        #   else if depth == 4
+        #     while (data.parent.parent.parent.parent.parent.parent)
+        #       data = data.parent
+        #   depth += 1
+        #   console.log("updated to data:")
+        #   console.log(data)
+        #   drawTreeMap(data)
+
+  node.exit()
+    .remove()
+
+  node.transition().duration(1500).call position
+
+  # d3.selectAll("#reset").on "click", ->
+  #   depth = 0
+  #   drawTreeMap(final)
 
 getDataForUrl = (dict, urlAddon) ->
   $.ajax(
@@ -101,8 +141,9 @@ getDataForUrl = (dict, urlAddon) ->
     dict['name'] = extractName(folder.path)
     children = []
     dict['children'] = children
-    if (urlAddon == "/")
-      getFreeSpace(dict)
+    # uncomment to view free space
+    #if (urlAddon == "/")
+      #getFreeSpace(dict)
     for file in folder.contents
       if file.is_dir
         cleaned_path = encodeURI(file.path)
@@ -121,7 +162,7 @@ getFreeSpace = (dict) ->
       "Authorization": "Bearer " + access_token
   ).fail (data) ->
     data = JSON.parse(data["responseText"])
-    #dict['children'].push({"name": 'Free Space', "size": data["quota_info"]["quota"]})
+    dict['children'].push({"name": 'Free Space', "size": data["quota_info"]["quota"]})
 
 access_token = null
 final = {}
@@ -137,16 +178,17 @@ $ ->
     $('#page1').hide()
     $('#pad').hide()
     setupTooltip()
+    createDivs()
     getDataForUrl(final, "/")
     prev_final = {}
     in_id = setInterval (->
       if (JSON.stringify(prev_final) == JSON.stringify(final))
         $('#loading').hide()
         $('form').show()
-        drawTreeMap()
         clearInterval(in_id)
+        #stored_final = jQuery.extend(true, {}, final)
+        drawTreeMap(final)
       prev_final = jQuery.extend(true, {}, final)
-      console.log(final)
     ), 1000
 
 

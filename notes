@@ -3,10 +3,12 @@
 
 
 TODOS:
--only read permissions
 DONE -add file size to tool tip
 DONE -don't show small files
--show free space
+DONE -fix tool tip location
+DONE -fix tool tip width
+DONE -show free space
+-only read permissions
 
 
 

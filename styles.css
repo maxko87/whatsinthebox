@@ -82,11 +82,11 @@ img {
 
 .node {
   border: solid 1px white;
-  font: 10px sans-serif;
-  line-height: 12px;
-  overflow: hidden;
   position: absolute;
-  text-indent: 2px;
+}
+
+.node:hover {
+  background: #3d464d;
 }
 
 button {
@@ -109,9 +109,9 @@ button {
   -moz-box-shadow: 0 1px 0 #ddd,inset 0 1px 0 rgba(255,255,255,0.2);
   -webkit-box-shadow: 0 1px 0 #ddd,inset 0 1px 0 rgba(255,255,255,0.2);
   box-shadow: 0 1px 0 #ddd,inset 0 1px 0 rgba(255,255,255,0.2);
-  text-shadow: rgba(0,0,0,0.2) 0 1px 0;
-  -webkit-text-shadow: rgba(0,0,0,0.2) 0 1px 0;
   -moz-text-shadow: rgba(0,0,0,0.2) 0 1px 0;
+  -webkit-text-shadow: rgba(0,0,0,0.2) 0 1px 0;
+  text-shadow: rgba(0,0,0,0.2) 0 1px 0;
 }
 
 button:hover {
@@ -122,4 +122,8 @@ button:hover {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#3baaf4", endColorstr="#2389dc");
   background: -webkit-gradient(linear, left top, left bottom, from(#3baaf4), to(#2389dc));
   background: -moz-linear-gradient(top, #3baaf4, #2389dc);
+}
+
+div.ui-tooltip {
+  max-width: 800px;
 }
